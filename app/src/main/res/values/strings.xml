@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">The Guardian News Feed</string>
+    <string name="news">The Guardian News</string>
+    <string name="refresh">Refresh</string>
+    <string name="no_news">We are sorry but it seems no News were found!</string>
+    <string name="cat_with_style">cat_with_style</string>
+    <string name="internet_con">Please check your internet connectivity</string>
+</resources>
