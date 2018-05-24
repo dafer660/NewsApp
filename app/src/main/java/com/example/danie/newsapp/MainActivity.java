@@ -31,15 +31,15 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>> {
 
     public static NewsArrayAdapter mAdapter;
+
     public TextView mEmptyStateTextView;
     public ImageView mEmptyStateImageView;
     public ProgressBar mEmptyProgressBar;
-    private static final int NEWS_LOADER_ID = 1;
     public SwipeRefreshLayout mSwipeRefreshLayout;
-//    private static final String API_KEY = "6cdc5ebc-d547-426b-9a3d-d4cf696d18f1";
-    private static final String API_KEY = "test";
+
+    private static final int NEWS_LOADER_ID = 1;
     private static final String GUARDIAN_CONTENT =
-            "https://content.guardianapis.com/search?order-by=newest&use-date=published&q=information%20security%2C%20cyber%20security%2C%20iot%2C%20business&api-key=" + API_KEY;
+            "http://content.guardianapis.com/search?q=technology,iot,cyber%20security&api-key=test&show-tags=contributor";
 
     @NonNull
     @Override
@@ -52,14 +52,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         View loadingIndicator = findViewById(R.id.loading_spinner);
         loadingIndicator.setVisibility(View.GONE);
 
-        // Set empty state text to display "No earthquakes found."
-        mEmptyStateTextView.setText(R.string.no_news);
-
-        // Clear the adapter of previous data
         mAdapter.clear();
 
-        // If there is a valid list of {@link News}s, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
+        // If there is a valid list of {@link News}s, then add them to the adapter's data set
         if (news != null && !news.isEmpty()) {
             mAdapter.addAll(news);
         }
@@ -71,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private static class NewsLoader extends AsyncTaskLoader<List<News>>{
-
         private String mUrl;
 
         NewsLoader(@NonNull Context context, String url) {
@@ -100,47 +94,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Find reference for the swipe refresh
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        // Find reference for the Swipe Refresh:
+        mSwipeRefreshLayout = findViewById(R.id.swiperefresh);
 
-        // Find a reference to the {@link ListView} in the layout
-        ListView newsListView = (ListView) findViewById(R.id.n_list);
+        // Create the empty State Views:
+        mEmptyStateTextView = findViewById(R.id.empty_view);
+        mEmptyProgressBar = findViewById(R.id.loading_spinner);
+        mEmptyStateImageView = findViewById(R.id.empty_image);
 
-        // Create a new adapter that takes an empty list of news articles
+        // Find a reference to the ListView:
+        ListView newsListView = findViewById(R.id.n_list);
+
+        // Create a new Array Adapter that takes an empty list of news articles:
         mAdapter = new NewsArrayAdapter(this, new ArrayList<News>());
 
-        ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        // Create the empty TextView
-        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-        mEmptyProgressBar = (ProgressBar) findViewById(R.id.loading_spinner);
-
-        // Set the adapter on the {@link ListView}
-        // so the list can be populated in the user interface
+        // Set the adapter on the {@link ListView}:
         newsListView.setAdapter(mAdapter);
 
-        // Set the empty views
-        newsListView.setEmptyView(mEmptyStateTextView);
+        // Create the Loader Manager:
+        LoaderManager loaderManager = getLoaderManager();
 
-        if (isConnected) {
-            mEmptyStateTextView.setText(R.string.no_news);
-            mEmptyStateTextView.setGravity(Gravity.CENTER);
-            newsListView.setEmptyView(mEmptyStateTextView);
-        }
-        else {
-            mEmptyProgressBar.setVisibility(View.GONE);
-            mEmptyStateTextView.setText(R.string.internet_con);
-            mEmptyStateTextView.setGravity(Gravity.CENTER);
-            newsListView.setEmptyView(mEmptyStateTextView);
-        }
+        // Initialize the loader.
+        loaderManager.initLoader(NEWS_LOADER_ID, null, this);
 
-        // Create the Loader Manager
-        final android.app.LoaderManager loaderManager = getLoaderManager();
-
-        // Set an item click listener on the ListView, which sends an intent to a web browser
-        // to open a website with more information about the selected article.
+        // Set onItemClickListener to send an intent to a web browser and open the URL
         newsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -158,11 +135,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        // Set OnScrollListener stub
         newsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                String LOG_REF = MainActivity.class.getSimpleName();
-                Log.e(LOG_REF, "Just a log for the onScrollStateChange.");
+                System.out.println("Just a stub");
             }
 
             @Override
@@ -171,11 +148,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        // This will update the news feed
+        final LoaderManager finalLoaderManager = loaderManager;
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 mSwipeRefreshLayout.setRefreshing(true);
-                loaderManager.initLoader(NEWS_LOADER_ID, null, MainActivity.this);
+                finalLoaderManager.initLoader(NEWS_LOADER_ID, null, MainActivity.this);
                 mSwipeRefreshLayout.setRefreshing(false);
 
                 // Write a Toast to let the user know the data was refreshed:
@@ -184,8 +163,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        // Initialize the loader.
-        loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+        // Create the Connectivity Manager Object to test network connectivity:
+        ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        // Create a bool for easier access:
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        // if not connected to the internet do this:
+        if (!isConnected) {
+
+            // hide the ProgressBar
+            mEmptyProgressBar.setVisibility(View.GONE);
+
+            // Set Text for no internet connectivity and tweak some
+            mEmptyStateTextView.setText(R.string.no_wifi);
+            mEmptyStateTextView.setGravity(Gravity.CENTER);
+
+            // Set image resource to show the no wifi image and tweak some
+            mEmptyStateImageView.setImageResource(R.drawable.no_wifi);
+            mEmptyStateImageView.setVisibility(View.VISIBLE);
+
+            // Set the empty views
+            newsListView.setEmptyView(mEmptyStateTextView);
+            newsListView.setEmptyView(mEmptyStateImageView);
+        }
+        // otherwise do this:
+        else {
+
+            // Create the Loader Manager:
+            loaderManager = getLoaderManager();
+
+            // Initialize the loader.
+            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+        }
     }
 }
 

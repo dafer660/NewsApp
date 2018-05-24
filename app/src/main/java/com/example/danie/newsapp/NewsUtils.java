@@ -21,14 +21,10 @@ import java.util.List;
 public final class NewsUtils{
 
     private static final String LOG_TAG = NewsUtils.class.getSimpleName();
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CON_TIMEOUT = 15000;
 
     public static List<News> fetchNews(String requestUrl){
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         // Create URL object
         URL url = createUrl(requestUrl);
 
@@ -66,8 +62,8 @@ public final class NewsUtils{
         InputStream inputStream = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setReadTimeout(READ_TIMEOUT /* milliseconds */);
+            urlConnection.setConnectTimeout(CON_TIMEOUT /* milliseconds */);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
@@ -123,20 +119,25 @@ public final class NewsUtils{
             for (int i = 0; i < resultArr.length(); i++) {
                 // Extract out the first feature (which is an article)
                 JSONObject results = resultArr.getJSONObject(i);
+                JSONArray tagsArr = results.getJSONArray("tags");
 
                 // Extract out the title, section, author (if it exists), date and url
                 String nTitle = results.getString("webTitle");
                 String nSection = results.getString("sectionName");
-                String nAuthor;
-                try {
-                    nAuthor = results.getString("author");
-                }
-                catch (Exception e){
-                    Log.e(LOG_TAG, "There was no tag with author/contributor");
-                    nAuthor = "Author unknown";
-                }
                 String nDate = results.getString("webPublicationDate");
                 String nURL = results.getString("webUrl");
+                String nAuthor = null;
+
+                // if there is the JSONArray is not empty get the Author
+                if (tagsArr.length() > 0) {
+                    for (int j = 0; j < tagsArr.length(); j++) {
+                        JSONObject tags = tagsArr.getJSONObject(j);
+                        nAuthor = tags.getString("webTitle");
+                    }
+                // else, Author will not be defined
+                } else {
+                    nAuthor = "Author not defined";
+                }
 
                 // Create a new {@link News} object
                 News currentNews = new News(nTitle, nSection, nAuthor, nDate, nURL);

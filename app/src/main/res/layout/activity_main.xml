@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/swiperefresh"
@@ -14,20 +13,12 @@
         android:orientation="vertical"
         tools:context=".MainActivity" >
 
-        <!--<TextView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="50dp"-->
-            <!--android:gravity="center"-->
-            <!--android:text="@string/news"-->
-            <!--android:textSize="25sp"/>-->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_centerInParent="true"
-            android:layout_centerHorizontal="true"
-            android:background="#ECEFF1">
+            android:layout_centerHorizontal="true">
 
             <ProgressBar
                 android:id="@+id/loading_spinner"
@@ -40,9 +31,17 @@
                 android:id="@+id/empty_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|start"
+                android:gravity="center_vertical|center_horizontal|center"
+                android:layout_gravity="center|center_vertical|center_horizontal"
                 android:textAlignment="center"
                 android:textAppearance="?android:textAppearanceMedium"/>
+
+            <ImageView
+                android:id="@+id/empty_image"
+                android:layout_gravity="center|center_vertical|center_horizontal"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:contentDescription="@string/no_news" />
 
         </LinearLayout>
 
@@ -50,8 +49,7 @@
             android:id="@+id/n_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawSelectorOnTop="true">
-        </ListView>
+            android:drawSelectorOnTop="true"/>
 
     </RelativeLayout>
 
