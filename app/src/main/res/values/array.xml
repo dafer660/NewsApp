@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="OrderBy_entries">
+        <item>Sort by Newest</item>
+        <item>Sort by Oldest</item>
+        <item>Sort by Relevance</item>
+    </string-array>
+
+    <string-array name="OrderBy_values">
+        <item>newest</item>
+        <item>oldest</item>
+        <item>relevance</item>
+    </string-array>
+</resources>
