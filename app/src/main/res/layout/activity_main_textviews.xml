@@ -10,13 +10,13 @@
         android:id="@+id/nSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"/>
+        android:textSize="@dimen/normal_plus_txt"/>
 
     <TextView
         android:id="@+id/nTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"/>
+        android:textSize="@dimen/bigger_txt"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,15 +28,15 @@
             android:id="@+id/nAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:paddingEnd="10dp"
-            android:paddingRight="10dp" />
+            android:textSize="@dimen/normal_txt"
+            android:paddingEnd="@dimen/normal_padding"
+            android:paddingRight="@dimen/normal_padding" />
 
         <TextView
             android:id="@+id/nDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/normal_txt"/>
 
     </LinearLayout>
 

@@ -1,17 +1,23 @@
 package com.example.danie.newsapp;
 
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -20,10 +26,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import android.app.LoaderManager;
-import android.content.Loader;
-import android.content.AsyncTaskLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +40,47 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public SwipeRefreshLayout mSwipeRefreshLayout;
 
     private static final int NEWS_LOADER_ID = 1;
+    private static final String SHOW_TAG = "contributor";
+    private static final String API_KEY = "test";
     private static final String GUARDIAN_CONTENT =
-            "http://content.guardianapis.com/search?q=technology,iot,cyber%20security&api-key=test&show-tags=contributor";
+            "http://content.guardianapis.com/search";
+//            "http://content.guardianapis.com/search?q=technology,iot,cyber%20security&api-key=test&show-tags=contributor";
 
     @NonNull
     @Override
     public Loader<List<News>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new NewsLoader(this, GUARDIAN_CONTENT);
+
+        // Create a SharedPreferences obj
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // getString retrieves a String value from the preferences
+        // 1st param = key; 2nd param = default value
+        String orderBy = sharedPrefs.getString(
+                getString(R.string.settings_orderby_key),
+                getString(R.string.settings_orderby_default));
+
+        String section = sharedPrefs.getString(
+                getString(R.string.settings_section_key),
+                getString(R.string.settings_section_default));
+
+        String query = sharedPrefs.getString(
+                getString(R.string.settings_query_key),
+                getString(R.string.settings_query_default));
+
+        // parse breaks apart the URI string that's passed into its parameter
+        Uri baseUri = Uri.parse(GUARDIAN_CONTENT);
+
+        // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        // Append query parameter and its value
+        uriBuilder.appendQueryParameter("section", section);
+        uriBuilder.appendQueryParameter("order-by", orderBy);
+        uriBuilder.appendQueryParameter("show-tags", SHOW_TAG);
+        uriBuilder.appendQueryParameter("q", query);
+        uriBuilder.appendQueryParameter("api-key", API_KEY);
+
+        return new NewsLoader(this, uriBuilder.toString());
     }
 
     @Override
@@ -87,6 +123,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
             return NewsUtils.fetchNews(mUrl);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.main_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -153,13 +206,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mSwipeRefreshLayout.setRefreshing(true);
-                finalLoaderManager.initLoader(NEWS_LOADER_ID, null, MainActivity.this);
-                mSwipeRefreshLayout.setRefreshing(false);
+            mSwipeRefreshLayout.setRefreshing(true);
+            finalLoaderManager.initLoader(NEWS_LOADER_ID, null, MainActivity.this);
+            mSwipeRefreshLayout.setRefreshing(false);
 
-                // Write a Toast to let the user know the data was refreshed:
-                Toast refreshToast = Toast.makeText(MainActivity.this, "Updating News", Toast.LENGTH_SHORT);
-                refreshToast.show();
+            // Write a Toast to let the user know the data was refreshed:
+            Toast refreshToast = Toast.makeText(MainActivity.this, "Updating News", Toast.LENGTH_SHORT);
+            refreshToast.show();
             }
         });
 

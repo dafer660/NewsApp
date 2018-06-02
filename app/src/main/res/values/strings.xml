@@ -1,9 +1,31 @@
 <resources>
+    <!--For the app-->
     <string name="app_name">The Guardian News Feed</string>
     <string name="refresh">Refresh</string>
+    
+    <!--Settings layout and Manifest-->
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">News Settings</string>
 
+    <!--Strings allocated to layouts-->
     <string name="no_wifi">Please check your internet connectivity</string>
     <string name="no_news">We are sorry but it seems no News were found!</string>
     <string name="no_wifi_img">no wifi image</string>
     <string name="no_news_img">no news image</string>
+    
+    <!--Strings for SettingsActivity-->
+    <string name="settings_orderby_label">Order By</string>
+    <string name="settings_section_label">Section</string>
+    <string name="settings_query_label">Query</string>
+
+    <!--Default Values for Guardian API Queries-->
+    <string name="settings_orderby_default">newest</string>
+    <string name="settings_section_default">technology</string>
+    <string name="settings_query_default">news</string>
+
+    <!--SettingsActivity Keys-->
+    <string name="settings_orderby_key" translatable="false">order_by</string>
+    <string name="settings_section_key" translatable="false">section</string>
+    <string name="settings_query_key" translatable="false">query</string>
+
 </resources>
