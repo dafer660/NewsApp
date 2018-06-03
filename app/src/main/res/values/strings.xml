@@ -6,6 +6,7 @@
     <!--Settings layout and Manifest-->
     <string name="settings_menu_item">Settings</string>
     <string name="settings_title">News Settings</string>
+    <string name="author_not_defined">Author not defined</string>
 
     <!--Strings allocated to layouts-->
     <string name="no_wifi">Please check your internet connectivity</string>
@@ -27,5 +28,12 @@
     <string name="settings_orderby_key" translatable="false">order_by</string>
     <string name="settings_section_key" translatable="false">section</string>
     <string name="settings_query_key" translatable="false">query</string>
+
+    <!--Log strings-->
+    <string name="http_req_failed">Problem making the HTTP request.</string>
+    <string name="url_create_failed">Error with creating URL.</string>
+    <string name="error_code">Error response code: </string>
+    <string name="get_json_failed">Problem retrieving the news JSON results.</string>
+    <string name="parse_json_failed">Problem parsing the news JSON results.</string>
 
 </resources>

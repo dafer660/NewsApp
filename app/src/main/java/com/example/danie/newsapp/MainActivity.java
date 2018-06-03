@@ -34,17 +34,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public static NewsArrayAdapter mAdapter;
 
-    public TextView mEmptyStateTextView;
-    public ImageView mEmptyStateImageView;
-    public ProgressBar mEmptyProgressBar;
-    public SwipeRefreshLayout mSwipeRefreshLayout;
+    private TextView mEmptyStateTextView;
+    private ImageView mEmptyStateImageView;
+    private ProgressBar mEmptyProgressBar;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private static final int NEWS_LOADER_ID = 1;
     private static final String SHOW_TAG = "contributor";
     private static final String API_KEY = "test";
     private static final String GUARDIAN_CONTENT =
             "http://content.guardianapis.com/search";
-//            "http://content.guardianapis.com/search?q=technology,iot,cyber%20security&api-key=test&show-tags=contributor";
 
     @NonNull
     @Override
@@ -101,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.clear();
     }
 
-    private static class NewsLoader extends AsyncTaskLoader<List<News>>{
+    private static class NewsLoader extends AsyncTaskLoader<List<News>> {
         private String mUrl;
 
         NewsLoader(@NonNull Context context, String url) {
@@ -123,6 +122,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
             return NewsUtils.fetchNews(mUrl);
         }
+
+        @Override
+        public void onContentChanged() {
+            super.onContentChanged();
+            System.out.println(mUrl);
+        }
     }
 
     @Override
@@ -140,6 +145,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(NEWS_LOADER_ID, null, this);
     }
 
     @Override
@@ -170,6 +181,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Initialize the loader.
         loaderManager.initLoader(NEWS_LOADER_ID, null, this);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                System.out.println(key);
+            }
+        };
+
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+
         // Set onItemClickListener to send an intent to a web browser and open the URL
         newsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -191,9 +213,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Set OnScrollListener stub
         newsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                System.out.println("Just a stub");
-            }
+            public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -207,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onRefresh() {
             mSwipeRefreshLayout.setRefreshing(true);
-            finalLoaderManager.initLoader(NEWS_LOADER_ID, null, MainActivity.this);
+            finalLoaderManager.restartLoader(NEWS_LOADER_ID, null, MainActivity.this);
             mSwipeRefreshLayout.setRefreshing(false);
 
             // Write a Toast to let the user know the data was refreshed:

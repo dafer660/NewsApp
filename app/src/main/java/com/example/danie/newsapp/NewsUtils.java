@@ -18,7 +18,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class NewsUtils{
+public final class NewsUtils {
 
     private static final String LOG_TAG = NewsUtils.class.getSimpleName();
     private static final int READ_TIMEOUT = 10000;
@@ -33,7 +33,8 @@ public final class NewsUtils{
         try {
             jsonResponse = makeHttpRequest(url);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making the HTTP request.", e);
+            String httpFailReq = NewsApp.getResourcesStatic().getString(R.string.http_req_failed);
+            Log.e(LOG_TAG, httpFailReq, e);
         }
 
         // Return the list of {@link News}s
@@ -45,7 +46,8 @@ public final class NewsUtils{
         try {
             url = new URL(stringUrl);
         } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Error with creating URL ", e);
+            String urlCreateFail = NewsApp.getResourcesStatic().getString(R.string.url_create_failed);
+            Log.e(LOG_TAG, urlCreateFail, e);
         }
         return url;
     }
@@ -73,10 +75,12 @@ public final class NewsUtils{
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             } else {
-                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+                String errorCode = NewsApp.getResourcesStatic().getString(R.string.error_code);
+                Log.e(LOG_TAG, errorCode + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving the news JSON results.", e);
+            String getJSONFailed  = NewsApp.getResourcesStatic().getString(R.string.get_json_failed);
+            Log.e(LOG_TAG, getJSONFailed, e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -136,7 +140,7 @@ public final class NewsUtils{
                     }
                 // else, Author will not be defined
                 } else {
-                    nAuthor = "Author not defined";
+                    nAuthor = NewsApp.getResourcesStatic().getString(R.string.author_not_defined);
                 }
 
                 // Create a new {@link News} object
@@ -146,7 +150,8 @@ public final class NewsUtils{
                 news.add(currentNews);
             }
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Problem parsing the news JSON results", e);
+            String errorParseJSON = NewsApp.getResourcesStatic().getString(R.string.parse_json_failed);
+            Log.e(LOG_TAG, errorParseJSON, e);
         }
         return news;
     }

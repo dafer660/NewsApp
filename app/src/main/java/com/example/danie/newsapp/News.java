@@ -3,12 +3,12 @@ package com.example.danie.newsapp;
 public class News {
 
     public final String title;
-    public final String section;
-    public final String authorName;
-    public final String newsDate;
-    public final String newsURL;
+    private final String section;
+    private final String authorName;
+    private final String newsDate;
+    private final String newsURL;
 
-    public News(String title, String section, String authorName, String newsDate, String newsURL) {
+    News(String title, String section, String authorName, String newsDate, String newsURL) {
         this.title = title;
         this.section = section;
         this.authorName = authorName;
